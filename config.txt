@@ -1,0 +1,4 @@
+# Define the STILTS command to use
+STILTS_CMD = java -jar /home/neil/bin/topcat/topcat-full.jar -stilts
+# Version number
+VERSION = 0.0.1
