@@ -28,14 +28,16 @@ UQUANT = constants.UQUANT
 # =============================================================================
 def runcommand(command, print_input=False, print_output=False, print_err=True,
                return_result=False):
-    result = sb.run(command, stdout=sb.PIPE, stderr=sb.PIPE,
-                    universal_newlines=True, shell=True)
+    res = sb.Popen(command, stdout=sb.PIPE, stderr=sb.PIPE,
+                     universal_newlines=True, shell=True)
+    res.wait()
+    result = res.communicate()
     if print_input:
         print(command)
     if print_output:
-        print(result.stdout)
-    if result.stderr != '' and print_err:
-        print(result.stderr)
+        print(result[0])
+    if result[1] != '' and print_err:
+        print(result[1])
     if return_result:
         return result
 

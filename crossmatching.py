@@ -76,7 +76,7 @@ def tmatch2(**kwargs):
     keys['icmd1'] = dict(v=['icmd1'], r=False)
     keys['icmd2'] = dict(v=['icmd2'], r=False)
     keys['ocmd'] = dict(v=['ocmd'], r=False)
-    keys['params'] = dict(v=['radius'], r=True, u=u.arcsec)
+    keys['params'] = dict(v=['radius', 'params'], r=False, u=u.arcsec)
     keys['out'] = dict(v=['outfile', 'out'], r=True)
     keys['fixcols'] = dict(v=['fixcols'], r=False, d='dups')
     keys['suffix1'] = dict(v=['suffix1'], r=False)

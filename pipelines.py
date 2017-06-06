@@ -32,9 +32,9 @@ def addcol(name, expression, infile=None):
 
 
 def addcols(infile, names, expressions):
-    ustr = None
+    ustr = ''
     for c in range(len(names)):
-        ustr = addcol(names[c], expressions[c], infile=None)
+        ustr += addcol(names[c], expressions[c], infile=None)
     tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
@@ -60,16 +60,15 @@ def renamecol(infile, oldname, newname):
 
 
 def renamecols(infile, oldnames, newnames):
-    ustr = None
     for c in range(len(oldnames)):
         ustr = updatemetadata(oldnames[c], name=newnames[c])
-    tpipe(cmds=ustr, infile=infile, outfile=infile)
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
 def replacecols(infile, names, expressions):
-    ustr = None
+    ustr = ''
     for c in range(len(names)):
-        ustr = replacecol(names[c], expressions[c], infile=None)
+        ustr += replacecol(names[c], expressions[c], infile=None)
     tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
