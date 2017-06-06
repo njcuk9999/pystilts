@@ -54,7 +54,6 @@ def tapskymatch(**kwargs):
     commandargs = command_arguments(keys, kwargs, 'tapskymatch')
     for key in commandargs:
         command += commandargs[key]
-    # print(command)
     # run command
     runcommand(command)
 
