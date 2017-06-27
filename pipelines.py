@@ -17,25 +17,322 @@ from . import utils
 # =============================================================================
 runcommand = utils.runcommand
 command_arguments = utils.command_arguments
+m_command_args = utils.multicommand_arguments
 STILTS = constants.STILTS
 
 
 # =============================================================================
 # Define functions
 # =============================================================================
-def addcol(name, expression, infile=None):
+def addcol(name, expression, before=None, after=None, units=None, ucd=None,
+           desc=None, infile=None, outfile=None):
+    """
+    Add a new column called "name" defined by the algebraic expression 
+    "expression". 
+    
+    :param name: string, the new column name
+    :param expression: string, the algebraic expression
+    :param before: string, the column name to position the new column before
+    :param after: string, the column name to position the new column after
+    :param units: string, the units for the column
+    :param ucd: string, the UCD for the column
+    :param desc: string, the description for the column
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+                   
+    By default the new column appears after the last column of the table, 
+    but you can position it either before or after a specified column using 
+    the "before" or "after" flags respectively. 
+    
+    The "units", "ucd" and "desc" flags can be used to define 
+    metadata values for the new column.
+
+    equivalent STILTS command:
+    
+    addcol [-after <col-id> | -before <col-id>]
+          [-units <units>] [-ucd <ucd>] [-utype <utype>] [-desc <descrip>]
+          <col-name> <expr>
+    
+    :return: 
+    """
+    cmdstr = ""
+    if before is not None:
+        cmdstr += '-before {0}'.format(__checkq__(str(before)))
+    if after is not None:
+        cmdstr += '-after {0}'.format(__checkq__(str(after)))
+    if units is not None:
+        cmdstr += '-units {0} '.format(__checkq__(str(units)))
+    if ucd is not None:
+        cmdstr += '-ucd {0} '.format(__checkq__(str(ucd)))
+    if desc is not None:
+        cmdstr += '-desc {0} '.format(__checkq__(str(desc)))
+
+    args = [cmdstr, name, __checkq__(expression)]
     if infile is None:
-        return 'addcol {0} {1} '.format(name, __checkq__(expression))
+        return 'addcol {0} {1} {2}'.format(*args)
+    if outfile is not None:
+        cmdstr = 'addcol {0} {1} {2}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
     else:
-        cmdstr = 'addcol {0} {1}'.format(name, __checkq__(expression))
+        cmdstr = 'addcol {0} {1} {2}'.format(*args)
         tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
-def addcols(infile, names, expressions):
+def addcols(infile, names, expressions, befores=None, afters=None, units=None,
+            ucds=None, descs=None, outfile=None):
+    """
+    Add new columns from list of "names" defined by the algebraic expressions 
+    "expressions". 
+
+    :param names: list of strings, the new column name for each column
+    :param expressions: list of strings, the algebraic expression of each 
+                        column
+    :param befores: list of strings, the column name to position each new 
+                    column before
+    :param afters: list of strings, the column name to position each new 
+                   column after
+    :param units: list of strings, the units for each column
+    :param ucds: list of strings, the UCD for each column
+    :param descs: list of strings, the description for the column
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+
+    By default the new columns appear after the last column of the table, 
+    but you can position it either before or after a specified column using 
+    the "befores" or "afters" flags respectively. 
+
+    The "units", "ucds" and "descs" flags can be used to define 
+    metadata values for the new column.
+
+    this is equivalent to a for loop over the STILTS command:
+
+    addcol [-after <col-id> | -before <col-id>]
+          [-units <units>] [-ucd <ucd>] [-utype <utype>] [-desc <descrip>]
+          <col-name> <expr>
+
+    :return: 
+    """
     ustr = ''
     for c in range(len(names)):
-        ustr += addcol(names[c], expressions[c], infile=None)
-    tpipe(cmds=ustr, infile=infile, outfile=infile)
+        kwargs = dict(infile=infile, outfile=outfile)
+        kwargs = m_command_args('before', kwargs, befores, c)
+        kwargs = m_command_args('after', kwargs, afters, c)
+        kwargs = m_command_args('units', kwargs, units, c)
+        kwargs = m_command_args('ucd', kwargs, ucds, c)
+        kwargs = m_command_args('desc', kwargs, descs, c)
+        ustr += addcol(names[c], expressions[c], **kwargs)
+
+    if outfile is None:
+        tpipe(cmds=ustr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
+
+
+def addresolve(colid, racol, deccol, infile=None, outfile=None):
+    """
+    Performs name resolution on the "colid" and appends two new columns 
+    "racol" and "deccol" containing the resolved Right Ascension and 
+    Declination in degrees. 
+    
+    :param colid: string, column name to resolve against (online)
+    :param racol: string, name of the new RA column
+    :param deccol: string, name of the new Dec column
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+                    
+    UCDs are added to the new columns in a way which tries to be consistent 
+    with any UCDs already existing in the table.
+
+    Since this filter works by interrogating a remote service, it will 
+    obviously be slow. The current implementation is experimental; it may 
+    be replaced in a future release by some way of doing the same thing 
+    (perhaps a new STILTS task) which is able to work more efficiently by 
+    dispatching multiple concurrent requests.
+
+    This is currently implemented using the Simbad service operated by CDS. 
+    
+    equivalent STILTS command:
+    
+    addresolve <col-id-objname> <col-name-ra> <col-name-dec>
+    
+    :return: 
+    """
+    args = [colid, racol, deccol]
+    if infile is None:
+        return 'addresolve {0} {1} {2}'.format(*args)
+    if outfile is not None:
+        cmdstr = 'addresolve {0} {1} {2}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'addresolve {0} {1} {2}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
+
+
+def addskycoords(insys, outsys, incol1, incol2, outcol1=None, outcol2=None,
+                 epoch=None, inunit=None, outunit=None, infile=None,
+                 outfile=None):
+    """
+    Add new columns to the table representing position on the sky. 
+    The values are determined by converting a sky position whose coordinates 
+    are contained in existing columns. 
+
+    :param insys: string, input coordinate system specifiers, must be one of
+                  the following: 
+
+                    - icrs: ICRS (Hipparcos) (Right Ascension, Declination)
+                    - fk5: FK5 J2000.0 (Right Ascension, Declination)
+                    - fk4: FK4 B1950.0 (Right Ascension, Declination)
+                    - galactic: IAU 1958 Galactic (Longitude, Latitude)
+                    - supergalactic: de Vaucouleurs Supergalactic 
+                                     (Longitude, Latitude)
+                    - ecliptic: Ecliptic (Longitude, Latitude)
+
+    :param outsys: string, output coordinate system specifiers, must be one of
+                  the following: 
+
+                    - icrs: ICRS (Hipparcos) (Right Ascension, Declination)
+                    - fk5: FK5 J2000.0 (Right Ascension, Declination)
+                    - fk4: FK4 B1950.0 (Right Ascension, Declination)
+                    - galactic: IAU 1958 Galactic (Longitude, Latitude)
+                    - supergalactic: de Vaucouleurs Supergalactic 
+                                     (Longitude, Latitude)
+                    - ecliptic: Ecliptic (Longitude, Latitude)
+
+    :param incol1: string, name of the input coordinate 1 column (e.g. RA)
+
+    :param incol2: string, name of the input coordinate 2 column (e.g. Dec)
+
+    :param outcol1: string, name of the output coordinate 1 column
+
+    :param outcol2: string, name of the output coordinate 2 column
+
+    :param epoch: float, epoch flag (used for certain conversions) default 
+                  is 2000.0
+
+    :param inunit: string, indicate the unit of the input coordinates, must be
+                   one of the following:
+
+                   - deg: for degrees
+                   - rad: for radians
+                   - sex: for sexagesimal
+
+    :param outunit: string, indicate the unit of the output coordinates, must be
+                    one of the following:
+
+                   - deg: for degrees
+                   - rad: for radians
+                   - sex: for sexagesimal
+                   
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+                   
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+              
+    Add new columns to the table representing position on the sky. 
+    The values are determined by converting a sky position whose coordinates 
+    are contained in existing columns. The "incol1" and "incol2" arguments 
+    give identifiers for the two input coordinate columns in the 
+    coordinate system named by "insys", and the "outcol1" and "outcol2" 
+    arguments name the two new columns, which will be in the coordinate system 
+    named by "outsys".
+      
+    equivalent STILTS command:
+    
+       addskycoords [-epoch <expr>] [-inunit deg|rad|sex] [-outunit deg|rad|sex]
+                    <insys> <outsys> <col-id1> <col-id2> <col-name1> <col-name2>
+                    
+    :return: 
+    """
+    cmdstr = ""
+    if outcol1 is None:
+        outcol1 = incol1
+    if outcol2 is None:
+        outcol2 = incol2
+
+    cunits = ['deg', 'degrees', 'rad', 'radians', 'sex', 'sexagesimal']
+    if epoch is not None:
+        try:
+            cmdstr += '-epoch {0}'.format(float(epoch))
+        except ValueError:
+            raise ValueError('Error: epoch must be a float')
+    if inunit is not None:
+        if inunit not in cunits:
+            raise ValueError('Error: inunit must be deg|rad|sex')
+        cmdstr += '-inunit {0}'.format(inunit)
+    if outunit is not None:
+        if outunit not in cunits:
+            raise ValueError('Error: outunit must be deg|rad|sex')
+        cmdstr += '-outunit {0}'.format(outunit)
+
+    args = [cmdstr, insys, outsys, incol1, incol2, outcol1, outcol2]
+    if infile is None:
+        return 'addskycoords {0} {1} {2} {3} {4} {5} {6}'.format(*args)
+    if outfile is not None:
+        ustr = 'addskycoords {0} {1} {2} {3} {4} {5} {6}'.format(*args)
+        tpipe(cmds=ustr, infile=infile, outfile=outfile)
+    else:
+        ustr = 'addskycoords {0} {1} {2} {3} {4} {5} {6}'.format(*args)
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
+
+
+def colmeta(colname, infile=None, name=None, units=None, ucd=None, desc=None,
+            outfile=None):
+    """
+    Modifies the metadata of one or more columns. Some or all of the name, 
+    units, ucd, utype and description of the column(s), 
+    identified by "colname" can be set by using some or all of the listed flags. 
+    
+    Typically, "colname" will simply be the name of a single column. 
+    
+    :param colname: string, name of the column to change meta data for
+    
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+                   
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+                    
+    :param name: string, new name for the column
+    
+    :param units: string, new unit for the column
+    
+    :param ucd: string, new UCD for the column
+    
+    :param desc: string, new description for the column
+    
+    :return: 
+    """
+    cmdstr = "colmeta "
+    if name is None and units is None and ucd is None and desc is None:
+        return 0
+    if name is not None:
+        cmdstr += '-name {0} '.format(__checkq__(str(name)))
+    if units is not None:
+        cmdstr += '-units {0} '.format(__checkq__(str(units)))
+    if ucd is not None:
+        cmdstr += '-ucd {0} '.format(__checkq__(str(ucd)))
+    if desc is not None:
+        cmdstr += '-desc {0} '.format(__checkq__(str(desc)))
+
+    cmdstr += '{0}'.format(colname)
+
+    if infile is None:
+        return cmdstr
+    if outfile is not None:
+        tpipe(cmdstr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmdstr, infile=infile, outfile=infile)
+
+
+def delcol(name, infile):
+    delcols(name, infile=infile)
 
 
 def delcols(names, infile=None):
@@ -114,29 +411,34 @@ def tpipe(cmds=None, **kwargs):
 
 
 def updatemetadata(colname, infile=None, name=None, units=None, ucd=None,
-                   desc=None):
-    cmdstr = "colmeta "
-    if name is None and units is None and ucd is None and desc is None:
-        return 0
-    if name is not None:
-        cmdstr += '-name {0} '.format(__checkq__(str(name)))
-    if units is not None:
-        cmdstr += '-units {0} '.format(__checkq__(str(units)))
-    if ucd is not None:
-        cmdstr += '-ucd {0} '.format(__checkq__(str(ucd)))
-    if desc is not None:
-        cmdstr += '-desc {0} '.format(__checkq__(str(desc)))
+                   desc=None, outfile=None):
+    """
+    Modifies the metadata of one or more columns. Some or all of the name, 
+    units, ucd, utype and description of the column(s), 
+    identified by "colname" can be set by using some or all of the listed flags. 
 
-    cmdstr += '{0}'.format(colname)
+    Typically, "colname" will simply be the name of a single column. 
 
+    :param colname: string, name of the column to change meta data for
+
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+
+    :param name: string, new name for the column
+
+    :param units: string, new unit for the column
+
+    :param ucd: string, new UCD for the column
+
+    :param desc: string, new description for the column
+
+    :return: 
+    """
     if infile is None:
-        return cmdstr
+        return colmeta(colname, infile, name, units, ucd, desc, outfile)
     else:
-        tpipe(cmdstr, infile=infile, outfile=infile)
-
-
-
-
-
-
+        colmeta(colname, infile, name, units, ucd, desc, outfile)
 
