@@ -33,21 +33,45 @@ __all__ = ['addcols', 'addcol',
 # =============================================================================
 # Pipeline functions
 # =============================================================================
-# Add columns
 addcols = pipelines.addcols
 addcol = pipelines.addcol
-# Delete columns
+addresolve = pipelines.addresolve
+addskycoords = pipelines.addskycoords
+assert_ = pipelines.assert_
+badval = pipelines.badval
+cache = pipelines.cache
+check = pipelines.check
+clearparams = pipelines.clearparams
+colmeta = pipelines.colmeta
 delcol = pipelines.delcols
 delcols = pipelines.delcols
-# Keep columns
+every = pipelines.every
+explodeall = pipelines.explodeall
+explodecols = pipelines.explodecols
+fixcolnames = pipelines.fixcolnames
+head = pipelines.head
 keepcol = pipelines.keepcols
 keepcols = pipelines.keepcols
-# Rename columns
+meta = pipelines.meta
+progress = pipelines.progress
+random = pipelines.random
+randomview = pipelines.randomview
 renamecol = pipelines.renamecol
 renamecols = pipelines.renamecols
-# Replace columns
+repeat = pipelines.repeat
 replacecol = pipelines.replacecol
 replacecols = pipelines.replacecols
+rowrange = pipelines.rowrange
+select = pipelines.select
+seqview = pipelines.seqview
+setparam = pipelines.setparam
+sort = pipelines.sort
+sorthead = pipelines.sorthead
+stats = pipelines.stats
+tablename = pipelines.tablename
+tail = pipelines.tail
+transpose = pipelines.transpose
+uniq = pipelines.uniq
 #tpipe
 tpipe = pipelines.tpipe
 # Update column meta data
