@@ -281,6 +281,55 @@ def addskycoords(insys, outsys, incol1, incol2, outcol1=None, outcol2=None,
         ustr = 'addskycoords {0} {1} {2} {3} {4} {5} {6}'.format(*args)
         tpipe(cmds=ustr, infile=infile, outfile=infile)
 
+# TODO: assert FUNCTION
+def assert_(expression):
+    """
+    Currently not implemented 
+    :param expression: 
+    :return: 
+    """
+    raise NotImplementedError("assert function is not currently implemented")
+
+
+# TODO: badval FUNCTION
+def badval(badvalue, colname):
+    """
+    Currently not implemented 
+    :param badvalue:
+    :param colname:
+    :return: 
+    """
+    raise NotImplementedError("badval function is not currently implemented")
+
+
+# TODO: cache FUNCTION
+def cache():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("cache function is not currently implemented")
+
+
+# TODO: check FUNCTION
+def check():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("check function is not currently implemented")
+
+
+# TODO: clearparams FUNCTION
+def clearparams(*pnames):
+    """
+    Currently not implemented 
+    :param pnames:
+    :return: 
+    """
+    raise NotImplementedError("clearparams function is not currently "
+                              "implemented")
+
 
 def colmeta(colname, infile=None, name=None, units=None, ucd=None, desc=None,
             outfile=None):
@@ -331,16 +380,90 @@ def colmeta(colname, infile=None, name=None, units=None, ucd=None, desc=None,
         tpipe(cmdstr, infile=infile, outfile=infile)
 
 
-def delcol(name, infile):
-    delcols(name, infile=infile)
+def delcol(name, infile=None):
+    """
+    Delete the specified columns. The same column may harmlessly be specified 
+    more than once. 
+    
+    :param name: string, the name of the column(s) to delete
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+    :return: 
+    """
+    if infile is None:
+        return delcols(name)
+    else:
+        delcols(name, infile=infile)
 
 
 def delcols(names, infile=None):
+    """
+    Delete the specified columns. The same column may harmlessly be specified 
+    more than once. 
+
+    :param name: string, the name of the column(s) to delete
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+    :return: 
+    """
     if infile is None:
         return 'delcols {0}'.format(__checkq__(" ".join(names)))
     else:
         cmdstr = 'delcols {0}'.format(__checkq__(" ".join(names)))
         tpipe(cmds=cmdstr, infile=infile, outfile=infile)
+
+
+# TODO: every FUNCTION
+def every(step):
+    """
+    Currently not implemented
+    :param every: 
+    :return: 
+    """
+    raise NotImplementedError("every function is not currently implemented")
+
+
+# TODO: explodeall FUNCTION
+def explodeall(ifndim, ifshape):
+    """
+    Currently not implemented
+    :param ifndim:
+    :param ifshape:
+    :return: 
+    """
+    raise NotImplementedError("explodeall function is not currently "
+                              "implemented")
+
+
+# TODO: explodecols FUNCTION
+def explodecols(colnames):
+    """
+    Currently not implemented
+    :param colnames: 
+    :return: 
+    """
+    raise NotImplementedError("explodecols function is not currently "
+                              "implemented")
+
+
+# TODO: fixcolnames FUNCTION
+def fixcolnames():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("fixcolnames function is not currently "
+                              "implemented")
+
+
+# TODO: head FUNCTION
+def head(nrows):
+    """
+    Currently not implemented
+    :param nrows: 
+    :return: 
+    """
+    raise NotImplementedError("head function is not currently implemented")
 
 
 def keepcols(names, infile=None):
@@ -349,6 +472,45 @@ def keepcols(names, infile=None):
     else:
         cmdstr = 'keepcols {0}'.format(__checkq__(" ".join(names)))
         tpipe(cmds=cmdstr, infile=infile, outfile=infile)
+
+
+# TODO: meta FUNCTION
+def meta():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("meta function is not currently implemented")
+
+
+# TODO: progress FUNCTION
+def progress():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("progress function is not currently "
+                              "implemented")
+
+
+# TODO: random FUNCTION
+def random():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("random function is not currently "
+                              "implemented")
+
+
+# TODO: randomview FUNCTION
+def randomview():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("randomview function is not currently "
+                              "implemented")
 
 
 def renamecol(infile, oldname, newname):
@@ -362,11 +524,17 @@ def renamecols(infile, oldnames, newnames):
         tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
-def replacecols(infile, names, expressions):
-    ustr = ''
-    for c in range(len(names)):
-        ustr += replacecol(names[c], expressions[c], infile=None)
-    tpipe(cmds=ustr, infile=infile, outfile=infile)
+# TODO: repeat FUNCTION
+def repeat(count, row=None, table=None):
+    """
+    Currently not implemented 
+    :param count:
+    :param row:
+    :param table:
+    :return: 
+    """
+    raise NotImplementedError("repeat function is not currently "
+                              "implemented")
 
 
 def replacecol(colname, expression, infile=None):
@@ -375,6 +543,129 @@ def replacecol(colname, expression, infile=None):
     else:
         cmdstr = 'replacecol {0} {1} '.format(colname, __checkq__(expression))
         tpipe(cmd=cmdstr, infile=infile, outfile=infile)
+
+
+def replacecols(infile, names, expressions):
+    ustr = ''
+    for c in range(len(names)):
+        ustr += replacecol(names[c], expressions[c], infile=None)
+    tpipe(cmds=ustr, infile=infile, outfile=infile)
+
+
+# TODO: replaceval FUNCTION
+def replaceval(colname, old, new):
+    """
+    Currently not implemented 
+    :param colname:
+    :param old:
+    :param new:
+    :return: 
+    """
+    raise NotImplementedError("replaceval function is not currently "
+                              "implemented")
+
+
+# TODO: rowrange FUNCTION
+def rowrange(first, last=None, count=None):
+    """
+    Currently not implemented 
+    :param first:
+    :param last:
+    :param count:
+    :return: 
+    """
+    raise NotImplementedError("rowrange function is not currently "
+                              "implemented")
+
+
+# TODO: seqview FUNCTION
+def seqview():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("seqview function is not currently "
+                              "implemented")
+
+
+# TODO: setparam FUNCTION
+def setparam():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("setparam function is not currently "
+                              "implemented")
+
+
+# TODO: sort FUNCTION
+def sort():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("sort function is not currently implemented")
+
+
+# TODO: sorthead FUNCTION
+def sorthead():
+    """
+    Currently not implemented 
+    :return: 
+    """
+    raise NotImplementedError("sorthead function is not currently implemented")
+
+
+# TODO: stats FUNCTION
+def stats(*items):
+    """
+    Currently not implemented 
+    :param items:
+    :return: 
+    """
+    raise NotImplementedError("stats function is not currently implemented")
+
+
+# TODO: tablename FUNCTION
+def tablename(name):
+    """
+    Currently not implemented 
+    :param name:
+    :return: 
+    """
+    raise NotImplementedError("tablename function is not currently implemented")
+
+
+# TODO: tail FUNCTION
+def tail(nrows):
+    """
+    Currently not implemented 
+    :param nrows:
+    :return: 
+    """
+    raise NotImplementedError("tail function is not currently implemented")
+
+
+# TODO: transpose FUNCTION
+def transpose(colname, columnnames=None):
+    """
+    Currently not implemented 
+    :param colname:
+    :param columnnames:
+    :return: 
+    """
+    raise NotImplementedError("transpose function is not currently implemented")
+
+
+# TODO: uniq FUNCTION
+def uniq(colname, count=None):
+    """
+    Currently not implemented 
+    :param colname:
+    :param count:
+    :return: 
+    """
+    raise NotImplementedError("uniq function is not currently implemented")
 
 
 def __checkq__(expression):
