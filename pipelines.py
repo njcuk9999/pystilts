@@ -578,6 +578,17 @@ def rowrange(first, last=None, count=None):
                               "implemented")
 
 
+# TODO: select FUNCTION
+def select(expression):
+    """
+    Currently not implemented 
+    :param expression:
+    :return: 
+    """
+    raise NotImplementedError("select function is not currently "
+                              "implemented")
+
+
 # TODO: seqview FUNCTION
 def seqview():
     """
