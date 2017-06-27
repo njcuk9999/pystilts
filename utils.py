@@ -87,6 +87,14 @@ def command_arguments(keys, kwargs, callname):
     return commanddict
 
 
+def multicommand_arguments(key, kwargs, values, element):
+    if values is not None:
+        if type(values) != str and hasattr(values, '__len__'):
+            kwargs[key] = values[element]
+        else:
+            kwargs[key] = values
+    return kwargs
+
 
 # =============================================================================
 # File functions
