@@ -281,43 +281,109 @@ def addskycoords(insys, outsys, incol1, incol2, outcol1=None, outcol2=None,
         ustr = 'addskycoords {0} {1} {2} {3} {4} {5} {6}'.format(*args)
         tpipe(cmds=ustr, infile=infile, outfile=infile)
 
-# TODO: assert FUNCTION
-def assert_(expression):
+
+def assert_(expression, infile=None, outfile=None):
     """
-    Currently not implemented 
-    :param expression: 
+    Check that a boolean expression is true for each row. 
+    
+    If the "expression" does not evaluate true for any row of the table, 
+    execution terminates with an error. As long as no error occurs, the output 
+    table is identical to the input one. 
+    
+    :param expression: string, the algebraic expression that must evaluate to
+                       True for at least one of the rows of the table
+    
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+                   
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("assert function is not currently implemented")
+    args = [expression]
+    if infile is None:
+        return 'assert {0}'.format(*args)
+    if outfile is not None:
+        cmdstr = 'assert {0}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'assert {0}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
-# TODO: badval FUNCTION
-def badval(badvalue, colname):
+def badval(badvalue, colname, infile=None, outfile=None):
     """
-    Currently not implemented 
-    :param badvalue:
-    :param colname:
+    For each column specified in "colname" any occurrence of the value 
+    "badvalue" is replaced by a blank entry. 
+    
+    :param badvalue: string, value to replace
+    
+    :param colname: string, colname to search and replace bad values
+    
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+                   
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("badval function is not currently implemented")
+    args = [__checkq__(badvalue), __checkq__(colname)]
+    if infile is None:
+        return 'badval {0} {1}'.format(*args)
+    if outfile is not None:
+        cmdstr = 'badval {0} {1}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'badval {0} {1}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
-# TODO: cache FUNCTION
-def cache():
+def cache(infile=None, outfile=None):
     """
-    Currently not implemented 
+    Stores in memory or on disk a temporary copy of the table at this point in 
+    the pipeline. This can provide improvements in efficiency if there is an 
+    expensive step upstream and a step which requires more than one read of the 
+    data downstream. If you see an error like "Can't re-read data from stream" 
+    then adding this step near the start of the filters might help. 
+    
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+                   
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("cache function is not currently implemented")
+    if infile is None:
+        return 'cache'
+    if outfile is not None:
+        cmdstr = 'cache'
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'cache'
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
-# TODO: check FUNCTION
-def check():
+def check(infile=None, outfile=None):
     """
-    Currently not implemented 
+    Runs checks on the table at the indicated point in the processing pipeline. 
+    This is strictly a debugging measure, and may be time-consuming for 
+    large tables.  
+
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("check function is not currently implemented")
+    if infile is None:
+        return 'check'
+    if outfile is not None:
+        cmdstr = 'check'
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'check'
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
 # TODO: clearparams FUNCTION
@@ -413,14 +479,32 @@ def delcols(names, infile=None):
         tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
-# TODO: every FUNCTION
-def every(step):
+def every(step, infile=None, outfile=None):
     """
-    Currently not implemented
-    :param every: 
+    Include only every "step"th row in the result, starting with the first row. 
+    
+    :param step: int or string, starting with the first row only include every 
+                 "step"th row
+    
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+                   
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("every function is not currently implemented")
+    try:
+        step = int(step)
+    except ValueError:
+        raise ValueError("Error: step must be an integer number")
+    if infile is None:
+        return 'step {0}'.format(step)
+    if outfile is not None:
+        cmdstr = 'step {0}'.format(step)
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'step {0}'.format(step)
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
 # TODO: explodeall FUNCTION
@@ -446,24 +530,59 @@ def explodecols(colnames):
                               "implemented")
 
 
-# TODO: fixcolnames FUNCTION
-def fixcolnames():
+def fixcolnames(infile=None, outfile=None):
     """
-    Currently not implemented 
+    Renames all columns and parameters in the input table so that they have 
+    names which have convenient syntax for STILTS. For the most part this 
+    means replacing spaces and other non-alphanumeric characters with 
+    underscores. 
+    
+    This is a convenience which lets you use column names in algebraic 
+    expressions and other STILTS syntax. 
+
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("fixcolnames function is not currently "
-                              "implemented")
+    if infile is None:
+        return 'fixcolnames'
+    if outfile is not None:
+        cmdstr = 'fitcolnames'
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'fitcolnames'
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
-# TODO: head FUNCTION
-def head(nrows):
+def head(nrows, infile=None, outfile=None):
     """
-    Currently not implemented
-    :param nrows: 
+    Include only the first "nrows" rows of the table. If the table has fewer 
+    than "nrows" rows then it will be unchanged. 
+    
+    :param nrows: int, the number of rows (from the first row) to keep
+    
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("head function is not currently implemented")
+    try:
+        nrows = int(nrows)
+    except ValueError:
+        raise ValueError('Error: nrows must be an integer')
+    if infile is None:
+        return 'head {0}'.format(nrows)
+    if outfile is not None:
+        cmdstr = 'head {0}'.format(nrows)
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'head {0}'.format(nrows)
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
 def keepcols(names, infile=None):
@@ -475,53 +594,144 @@ def keepcols(names, infile=None):
 
 
 # TODO: meta FUNCTION
-def meta():
+def meta(*items):
     """
     Currently not implemented 
+    :param items:
     :return: 
     """
     raise NotImplementedError("meta function is not currently implemented")
 
 
-# TODO: progress FUNCTION
-def progress():
+def progress(infile=None, outfile=None):
     """
-    Currently not implemented 
+    Monitors progress by displaying the number of rows processed so far on the 
+    terminal (standard error). This number is updated every second or 
+    thereabouts; if all the processing is done in under a second you may not 
+    see any output. If the total number of rows in the table is known, an 
+    ASCII-art progress bar is updated, otherwise just the number of rows seen 
+    so far is written.
+
+    Note under some circumstances progress may appear to complete before the 
+    actual work of the task is done since part of the processing involves 
+    slurping up the whole table to provide random access on it. In this case, 
+    applying the cache upstream may help. 
+
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("progress function is not currently "
-                              "implemented")
+    if infile is None:
+        return 'progress'
+    if outfile is not None:
+        cmdstr = 'progress'
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'progress'
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
-# TODO: random FUNCTION
-def random():
+def random(infile=None, outfile=None):
     """
-    Currently not implemented 
+    Ensures that random access is available on this table. If the table 
+    currently has random access, it has no effect. If only sequential access 
+    is available, the table is cached so that downstream steps will see the 
+    cached, hence random-access, copy. 
+
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("random function is not currently "
-                              "implemented")
+    if infile is None:
+        return 'random'
+    if outfile is not None:
+        cmdstr = 'random'
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'random'
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
-# TODO: randomview FUNCTION
-def randomview():
+def randomview(infile=None, outfile=None):
     """
-    Currently not implemented 
+    Ensures that steps downstream only use random access methods for table 
+    access. If the table is sequential only, this will result in an error. 
+    Only useful for debugging.
+
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
     :return: 
     """
-    raise NotImplementedError("randomview function is not currently "
-                              "implemented")
+    if infile is None:
+        return 'randomview'
+    if outfile is not None:
+        cmdstr = 'randomview'
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'randomview'
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
-def renamecol(infile, oldname, newname):
+def renamecol(oldname, newname, infile=None, outfile=None):
+    """
+    Rename column "oldname" to "newname"
+
+    :param oldname: string, old column name
+    
+    :param newname: string, new column name
+    
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+    :return: 
+    """
     ustr = updatemetadata(oldname, name=newname)
-    tpipe(cmds=ustr, infile=infile, outfile=infile)
+    if infile is None:
+        return ustr
+    if outfile is not None:
+        tpipe(cmds=ustr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
-def renamecols(infile, oldnames, newnames):
+def renamecols(oldnames, newnames, infile=None, outfile=None):
+    """
+    Rename column "oldname" to "newname"
+
+    :param oldnames: list of strings, old column names
+
+    :param newnames: list of strings, new column names
+
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+    :return: 
+    """
+    ustrs = ""
     for c in range(len(oldnames)):
         ustr = updatemetadata(oldnames[c], name=newnames[c])
         tpipe(cmds=ustr, infile=infile, outfile=infile)
+        if infile is None:
+            ustrs += "{0} ".format(ustr)
+        if outfile is not None:
+            tpipe(cmds=ustr, infile=infile, outfile=outfile)
+        else:
+            tpipe(cmds=ustr, infile=infile, outfile=infile)
+    if infile is None:
+        return ustrs
 
 
 # TODO: repeat FUNCTION
