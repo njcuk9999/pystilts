@@ -586,6 +586,7 @@ def head(nrows, infile=None, outfile=None):
 
 
 def keepcols(names, infile=None):
+    # TODO: keepcols needs description
     if infile is None:
         return 'keepcols {0}'.format(__checkq__(" ".join(names)))
     else:
@@ -748,6 +749,7 @@ def repeat(count, row=None, table=None):
 
 
 def replacecol(colname, expression, infile=None):
+    # TODO: replacecol needs description
     if infile is None:
         return 'replacecol {0} {1} '.format(colname, __checkq__(expression))
     else:
@@ -756,6 +758,7 @@ def replacecol(colname, expression, infile=None):
 
 
 def replacecols(infile, names, expressions):
+    # TODO: replacecols needs description
     ustr = ''
     for c in range(len(names)):
         ustr += replacecol(names[c], expressions[c], infile=None)
@@ -896,7 +899,7 @@ def __checkq__(expression):
 
 
 def tpipe(cmds=None, **kwargs):
-
+    # TODO: replacecol needs description
     # cmds is a special case has no argument (just insert onto command line)
     if cmds is None:
         command = "{0} {1} ".format(STILTS, "tpipe")
