@@ -735,60 +735,199 @@ def renamecols(oldnames, newnames, infile=None, outfile=None):
         return ustrs
 
 
-# TODO: repeat FUNCTION
-def repeat(count, row=None, table=None):
+def repeat(count, kind='table', infile=None, outfile=None):
     """
-    Currently not implemented 
-    :param count:
-    :param row:
-    :param table:
+    The optional flag determines the sequence of the output rows. If "count"=2 
+    and there are three rows, the output sequence will be 112233 for kind="row" 
+    and 123123 for kind="table". The default behaviour is currently "table". 
+    
+    :param count: int, number of rows
+    
+    :param kind: string, determines the type of repetition, must be either:
+                 - "row" for repeating each first row then each second row
+                         i.e. 123 -> 112233
+                 - "table" for repeating the table each time
+                         i.e. 123 --> 123123
+
     :return: 
     """
-    raise NotImplementedError("repeat function is not currently "
-                              "implemented")
-
-
-def replacecol(colname, expression, infile=None):
-    # TODO: replacecol needs description
-    if infile is None:
-        return 'replacecol {0} {1} '.format(colname, __checkq__(expression))
+    try:
+        count = int(count)
+    except ValueError:
+        raise ValueError("Error: count must be an integer")
+    if kind == 'row':
+        kindresult = '-row'
     else:
-        cmdstr = 'replacecol {0} {1} '.format(colname, __checkq__(expression))
-        tpipe(cmd=cmdstr, infile=infile, outfile=infile)
+        kindresult = '-table'
+    ustr = 'repeat {0} {1}'.format(kindresult, count)
+    if infile is None:
+        return ustr
+    if outfile is not None:
+        tpipe(cmds=ustr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
-def replacecols(infile, names, expressions):
-    # TODO: replacecols needs description
+def replacecol(name, expression, units=None, ucd=None, desc=None, infile=None,
+               outfile=None):
+    """
+    Replaces the content of a column with the value of an algebraic expression. 
+    The old values are discarded in favour of the result of evaluating 
+    "expression". 
+    
+    You can specify the metadata for the new column using the -name, -units, 
+    -ucd, -utype and -desc flags; for any of these items which you do not 
+    specify, they will take the values from the column being replaced. 
+    
+    :param name: string, the column name to replace
+    :param expression: string, the algebraic expression for the column
+    :param units: string, the units for the column
+    :param ucd: string, the UCD for the column
+    :param desc: string, the description for the column
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+                   
+    """
+    cmdstr = ""
+    if units is not None:
+        cmdstr += '-units {0} '.format(__checkq__(str(units)))
+    if ucd is not None:
+        cmdstr += '-ucd {0} '.format(__checkq__(str(ucd)))
+    if desc is not None:
+        cmdstr += '-desc {0} '.format(__checkq__(str(desc)))
+
+    args = [cmdstr, name, __checkq__(expression)]
+    if infile is None:
+        return 'replacecol {0} {1} {2}'.format(*args)
+    if outfile is not None:
+        cmdstr = 'replacecol {0} {1} {2}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'replacecol {0} {1} {2}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
+
+
+def replacecols(infile, names, expressions, units=None, ucds=None, descs=None,
+                outfile=None):
+    """
+    Replaces columns from list of "names" defined by the algebraic expressions 
+    "expressions". 
+
+    :param names: list of strings, the new column name for each column
+    :param expressions: list of strings, the algebraic expression of each 
+                        column
+    :param units: list of strings, the units for each column
+    :param ucds: list of strings, the UCD for each column
+    :param descs: list of strings, the description for the column
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile
+
+    By default the new columns appear after the last column of the table, 
+    but you can position it either before or after a specified column using 
+    the "befores" or "afters" flags respectively. 
+
+    The "units", "ucds" and "descs" flags can be used to define 
+    metadata values for the new column.
+
+    this is equivalent to a for loop over the STILTS command:
+
+    addcol [-after <col-id> | -before <col-id>]
+          [-units <units>] [-ucd <ucd>] [-utype <utype>] [-desc <descrip>]
+          <col-name> <expr>
+
+    :return: 
+    """
     ustr = ''
     for c in range(len(names)):
-        ustr += replacecol(names[c], expressions[c], infile=None)
-    tpipe(cmds=ustr, infile=infile, outfile=infile)
+        kwargs = dict(infile=infile, outfile=outfile)
+        kwargs = m_command_args('units', kwargs, units, c)
+        kwargs = m_command_args('ucd', kwargs, ucds, c)
+        kwargs = m_command_args('desc', kwargs, descs, c)
+        ustr += replacecol(names[c], expressions[c], **kwargs)
+
+    if outfile is None:
+        tpipe(cmds=ustr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
-# TODO: replaceval FUNCTION
-def replaceval(colname, old, new):
+def replaceval(colname, oldval, newval, infile=None, outfile=None):
     """
-    Currently not implemented 
-    :param colname:
-    :param old:
-    :param new:
+    For each column specified in "colname" any instance of "oldval" is replaced
+    by "newval". The value string 'null' can be used for either "oldval" or 
+    "newval" to indicate a blank value (but see also the badval filter). 
+    
+    :param colname: string, the column name to replace
+    :param oldval: string, old value to be replaced by newval
+    :param newval: string, new value to replace oldval
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile            
+    """
+    args = [colname, oldval, newval]
+    if infile is None:
+        return 'replaceval {0} {1} {2}'.format(*args)
+    if outfile is not None:
+        cmdstr = 'replaceval {0} {1} {2}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        cmdstr = 'replaceval {0} {1} {2}'.format(*args)
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
+
+
+def rowrange(first, last=None, count=None, infile=None, outfile=None):
+    """
+    Includes only rows in a given range. The range can either be supplied as 
+    "first" and "last", where row indices are inclusive, or 
+    "first" + "count". In either case, the first row is numbered 1.
+
+    E.g. to get the first hundred rows, use either first="1" last="100" or 
+    first="1" count="100"
+    
+    E.g. to get the second hundred rows, use either 
+    first="101" last="200" or first="101" count="100"
+     
+    :param first: int, the starting row (first row = 1)
+    :param last: int, the end row
+    :param count: int, the number of rows from first row
+    :param infile: string, the location and file name for the input file, if
+                   not defined will return the STILTS command string
+    :param outfile: string, the location and file name for the output file,
+                    if not defined will default to infile    
     :return: 
     """
-    raise NotImplementedError("replaceval function is not currently "
-                              "implemented")
+    if last is None and count is None:
+        raise ValueError("Error: last or count must be defined")
+    elif last is None:
+        try:
+            count = int(count)
+        except ValueError:
+            raise ValueError("Error: count must be an integer")
+    elif count is None:
+        try:
+            last = int(last)
+        except ValueError:
+            raise ValueError("Error: last must be an integer")
+    try:
+        first = int(first)
+    except ValueError:
+        raise ValueError("Error: first must be an integer")
 
-
-# TODO: rowrange FUNCTION
-def rowrange(first, last=None, count=None):
-    """
-    Currently not implemented 
-    :param first:
-    :param last:
-    :param count:
-    :return: 
-    """
-    raise NotImplementedError("rowrange function is not currently "
-                              "implemented")
+    if last is None:
+        ustr = 'rowrange {0} +{1}'.format(first, count)
+    else:
+        ustr = 'rowrange {0} {1}'.format(first, last)
+    if infile is None:
+        return ustr
+    if outfile is not None:
+        tpipe(cmds=ustr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
 # TODO: select FUNCTION
