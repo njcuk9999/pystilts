@@ -20,7 +20,7 @@ Make sure pystilts folder is on python path
     ```
     setenv PYTHONPATH ~/bin/python-scripts/
     ```
-        Or 
+    Or 
     ```
     setenv PYTHONPATH ${PATH}:~/bin/python-scripts/
     ```
