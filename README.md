@@ -113,7 +113,7 @@ pystilts.tmatch2(in1=filename1, in2=filename2, out=filename3,
 * Here we crossmatch with PPMXL (Roeser et al. 2011), keep only the 'ra' and 'dec' columns from 'table1.fits', name all columns from ppmxl with a suffix of '_ppmxl' and then rename table1.fits 'ra' and 'dec' columns to 'ra_table1', 'dec_table1'
 
 ```python
-from pystilts import tapskymatch, tmatch2
+from pystilts import tapskymatch
 from pystilts import keepcols, renamecols
 
 filename = 'table1.fits'
