@@ -188,6 +188,7 @@ def tmatch2(**kwargs):
     keys['fixcols'] = dict(v=['fixcols'], r=False, d='dups')
     keys['suffix1'] = dict(v=['suffix1'], r=False)
     keys['suffix2'] = dict(v=['suffix2'], r=False)
+    keys['find'] = dict(v=['find'], r=False)
     # write the command
     commandargs = command_arguments(keys, kwargs, 'tmatch2')
     for key in commandargs:
