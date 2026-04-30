@@ -1,4 +1,4 @@
 # Define the STILTS command to use
-STILTS_CMD = java -jar /home/neil/bin/topcat/topcat-full.jar -stilts
+STILTS_CMD = java -jar /home/cook/.local/share/pystilts/topcat-full.jar -stilts
 # Version number
-VERSION = 0.0.1
+VERSION = 0.1.0

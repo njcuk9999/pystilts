@@ -13,11 +13,19 @@ Version 0.0.0
 from . import crossmatching
 from . import pipelines
 from . import utils
+from . import bootstrap
+from importlib import metadata
 import os
 
 __author__ = "Neil Cook"
 __email__ = 'neil.james.cook@gmail.com'
-__version__ = '0.1'
+try:
+    from ._version import version as __version__
+except Exception:
+    try:
+        __version__ = metadata.version('pystilts')
+    except metadata.PackageNotFoundError:
+        __version__ = '0.1.0'
 __location__ = os.path.realpath(os.path.join(os.getcwd(),
                                              os.path.dirname(__file__)))
 __all__ = ['addcols', 'addcol',
@@ -27,7 +35,9 @@ __all__ = ['addcols', 'addcol',
            'replacecol', 'replacecols',
            'tpipe', 'updatemeta',
            'tapskymatch', 'tmatch2',
-           'clean']
+           'clean', 'bootstrap_stilts',
+           'select', 'seqview', 'setparam',
+           'sort', 'tablename', 'tail', 'uniq']
 
 
 # =============================================================================
@@ -63,16 +73,17 @@ replacecol = pipelines.replacecol
 replacecols = pipelines.replacecols
 replaceval = pipelines.replaceval
 rowrange = pipelines.rowrange
-# select = pipelines.select
-# seqview = pipelines.seqview
-# setparam = pipelines.setparam
-# sort = pipelines.sort
+select = pipelines.select
+seqview = pipelines.seqview
+setparam = pipelines.setparam
+sort = pipelines.sort
 # sorthead = pipelines.sorthead
 # stats = pipelines.stats
 # tablename = pipelines.tablename
-# tail = pipelines.tail
+tablename = pipelines.tablename
+tail = pipelines.tail
 # transpose = pipelines.transpose
-# uniq = pipelines.uniq
+uniq = pipelines.uniq
 #tpipe
 tpipe = pipelines.tpipe
 # Update column meta data
@@ -89,3 +100,4 @@ tmatch2 = crossmatching.tmatch2
 # Utility functions
 # =============================================================================
 clean = utils.clean_file
+bootstrap_stilts = bootstrap.bootstrap_stilts

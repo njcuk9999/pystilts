@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68", "setuptools_scm[toml]>=8", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pystilts"
+dynamic = ["version"]
+description = "Native Python wrapper around STILTS/TOPCAT commands"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Neil Cook", email = "neil.james.cook@gmail.com" }
+]
+dependencies = [
+  "astropy>=5",
+  "numpy>=1.23"
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Astronomy"
+]
+
+[project.urls]
+Homepage = "https://github.com/njcuk9999/pystilts"
+Documentation = "https://www.star.bris.ac.uk/~mbt/stilts/"
+
+[project.scripts]
+pystilts-bootstrap = "pystilts.bootstrap:main"
+
+[tool.setuptools]
+packages = ["pystilts"]
+
+[tool.setuptools.package-dir]
+pystilts = "."
+
+[tool.setuptools.package-data]
+pystilts = ["config.txt"]
+
+[tool.setuptools_scm]
+version_file = "_version.py"
+fallback_version = "0.1.0"
+

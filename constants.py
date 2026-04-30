@@ -10,7 +10,6 @@ Program description here
 Version 0.0.0
 """
 from astropy import units as u
-import numpy as np
 import os
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(),
@@ -19,25 +18,48 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(),
 # =============================================================================
 # Define functions
 # =============================================================================
-def read_config_file():
-    if 'config.txt' not in os.listdir(__location__):
-        raise FileNotFoundError("Config file missing...")
-    # Load config file
+def _default_data_dir():
+    xdg_data_home = os.environ.get('XDG_DATA_HOME')
+    if xdg_data_home:
+        return os.path.join(xdg_data_home, 'pystilts')
+    return os.path.join(os.path.expanduser('~'), '.local', 'share', 'pystilts')
 
-    keys, values = np.loadtxt(__location__ + '/config.txt', dtype=bytes,
-                              delimiter='=', unpack=True).astype(str)
-    filedict = dict(zip(keys, values))
-    # strip white spaces
-    for key in list(filedict.keys()):
-        filedict[key.strip()] = filedict[key].strip()
-    # Set up default values
-    data = dict()
-    data['STILTS_CMD'] = ['java -jar topcat-full.jar -stilts']
-    # Update the values from file if found
-    for r, rkey in enumerate(list(data.keys())):
-        if rkey in list(filedict.keys()):
-            data[rkey] = filedict[rkey]
-    # return config dictionary
+
+def _parse_config_file(config_path):
+    data = {}
+    if not os.path.exists(config_path):
+        return data
+    with open(config_path, 'r', encoding='utf-8') as fobj:
+        for line in fobj:
+            stripped = line.strip()
+            if not stripped or stripped.startswith('#') or '=' not in stripped:
+                continue
+            key, value = stripped.split('=', 1)
+            data[key.strip()] = value.strip()
+    return data
+
+
+def read_config_file():
+    config_path = os.path.join(__location__, 'config.txt')
+    filedict = _parse_config_file(config_path)
+
+    data = {
+        'STILTS_CMD': 'java -jar topcat-full.jar -stilts',
+    }
+
+    for key in list(data.keys()):
+        if key in filedict:
+            data[key] = filedict[key]
+
+    env_stilts = os.environ.get('PYSTILTS_STILTS_CMD')
+    if env_stilts:
+        data['STILTS_CMD'] = env_stilts
+
+    if 'STILTS_CMD' not in filedict and not env_stilts:
+        bundled_jar = os.path.join(_default_data_dir(), 'topcat-full.jar')
+        if os.path.exists(bundled_jar):
+            data['STILTS_CMD'] = 'java -jar {0} -stilts'.format(bundled_jar)
+
     return data
 
 

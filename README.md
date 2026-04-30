@@ -3,47 +3,41 @@ Native python wrapper of topcat/stilts ([http://www.star.bris.ac.uk/~mbt/stilts/
 
 ## 1. Installation
 
-### 1.1 Setup
+### 1.1 Install with pip (editable)
 
-Make sure pystilts folder is on python path
+From the project root:
 
-* with bash
-    ```
-    export PYTHONPATH = "~/bin/python-scripts/"
-    ```
-    Or 
-    ```
-    export PYTHONPATH = "${PATH}:~/bin/python-scripts/"
-    ```
-* with tcsh
- 
-    ```
-    setenv PYTHONPATH ~/bin/python-scripts/
-    ```
-    Or 
-    ```
-    setenv PYTHONPATH ${PATH}:~/bin/python-scripts/
-    ```
-
-where pystilts folder is in the directory
+```bash
+python -m pip install -U -e .
 ```
-~/bin/python-scripts/
+
+No `PYTHONPATH` edits are required.
+
+### 1.2 Java/STILTS requirement
+
+`pystilts` wraps STILTS commands, so Java + a STILTS-capable jar is still required.
+
+You can now bootstrap this automatically:
+
+```bash
+pystilts-bootstrap
 ```
-### 1.2 Setting up the config file
 
-You MUST set up the config file to point to STILTS
+This downloads `topcat-full.jar` to `~/.local/share/pystilts/` (or `$XDG_DATA_HOME/pystilts/`) and updates `config.txt` with a working `STILTS_CMD`.
 
-i.e. the line that reads:
+Alternative: download standalone STILTS jar instead:
 
-```commandline
-# Define the STILTS command to use
-STILTS_CMD = java -jar /home/neil/bin/topcat/topcat-full.jar -stilts
+```bash
+pystilts-bootstrap --use stilts
 ```
-must link to your topcat jar
 
-If you do not have topcat get it from here: [http://www.star.bristol.ac.uk/~mbt/topcat/#install](http://www.star.bristol.ac.uk/~mbt/topcat/#install)
+You can override at runtime without editing files:
 
-If you are able to run STILTS from the command line you are able to run this python module. (Note the STILTS command for windows/mac may not be the same form as above).
+```bash
+export PYSTILTS_STILTS_CMD="java -jar /path/to/topcat-full.jar -stilts"
+```
+
+If you already have STILTS on `PATH`, point `STILTS_CMD` in `config.txt` to your preferred command.
 
 ## 2. Documentation
 
@@ -79,6 +73,13 @@ Currently supported functions are:
     * replacecols(custom command - loop around replacecol)
     * replaceval
     * rowrange
+    * select
+    * seqview
+    * setparam
+    * sort
+    * tablename
+    * tail
+    * uniq
     * updatemeta (custom command - custom form of meta function in STILTS)
 
 * Commands

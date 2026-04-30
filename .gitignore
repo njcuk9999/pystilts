@@ -99,3 +99,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# setuptools_scm generated version file
+_version.py
+

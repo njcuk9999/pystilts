@@ -498,12 +498,12 @@ def every(step, infile=None, outfile=None):
     except ValueError:
         raise ValueError("Error: step must be an integer number")
     if infile is None:
-        return 'step {0}'.format(step)
+        return 'every {0}'.format(step)
     if outfile is not None:
-        cmdstr = 'step {0}'.format(step)
+        cmdstr = 'every {0}'.format(step)
         tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
     else:
-        cmdstr = 'step {0}'.format(step)
+        cmdstr = 'every {0}'.format(step)
         tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
@@ -550,10 +550,10 @@ def fixcolnames(infile=None, outfile=None):
     if infile is None:
         return 'fixcolnames'
     if outfile is not None:
-        cmdstr = 'fitcolnames'
+        cmdstr = 'fixcolnames'
         tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
     else:
-        cmdstr = 'fitcolnames'
+        cmdstr = 'fixcolnames'
         tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
@@ -931,43 +931,87 @@ def rowrange(first, last=None, count=None, infile=None, outfile=None):
 
 
 # TODO: select FUNCTION
-def select(expression):
+def select(expression, infile=None, outfile=None):
     """
     Currently not implemented 
     :param expression:
     :return: 
     """
-    raise NotImplementedError("select function is not currently "
-                              "implemented")
+    if expression is None or str(expression).strip() == '':
+        raise ValueError('Error: expression must be set')
+    ustr = 'select {0}'.format(__checkq__(str(expression)))
+    if infile is None:
+        return ustr
+    if outfile is not None:
+        tpipe(cmds=ustr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
 # TODO: seqview FUNCTION
-def seqview():
+def seqview(infile=None, outfile=None):
     """
     Currently not implemented 
     :return: 
     """
-    raise NotImplementedError("seqview function is not currently "
-                              "implemented")
+    if infile is None:
+        return 'seqview'
+    if outfile is not None:
+        tpipe(cmds='seqview', infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds='seqview', infile=infile, outfile=infile)
 
 
 # TODO: setparam FUNCTION
-def setparam():
+def setparam(name, value, ptype=None, infile=None, outfile=None):
     """
     Currently not implemented 
     :return: 
     """
-    raise NotImplementedError("setparam function is not currently "
-                              "implemented")
+    if name is None or str(name).strip() == '':
+        raise ValueError('Error: name must be set')
+    if value is None:
+        raise ValueError('Error: value must be set')
+    cmdstr = 'setparam '
+    if ptype is not None:
+        cmdstr += '-type {0} '.format(__checkq__(str(ptype)))
+    cmdstr += '{0} {1}'.format(__checkq__(str(name)), __checkq__(str(value)))
+    if infile is None:
+        return cmdstr
+    if outfile is not None:
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
 # TODO: sort FUNCTION
-def sort():
+def sort(keys, descending=False, nulls_first=False, infile=None, outfile=None):
     """
     Currently not implemented 
     :return: 
     """
-    raise NotImplementedError("sort function is not currently implemented")
+    if keys is None:
+        raise ValueError('Error: keys must be set')
+    if isinstance(keys, str):
+        skeys = keys.strip()
+    else:
+        skeys = ' '.join([str(key) for key in keys]).strip()
+    if skeys == '':
+        raise ValueError('Error: keys must be set')
+
+    cmdstr = 'sort '
+    if descending:
+        cmdstr += '-down '
+    if nulls_first:
+        cmdstr += '-nullsfirst '
+    cmdstr += '{0}'.format(__checkq__(skeys))
+
+    if infile is None:
+        return cmdstr
+    if outfile is not None:
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
 # TODO: sorthead FUNCTION
@@ -990,23 +1034,43 @@ def stats(*items):
 
 
 # TODO: tablename FUNCTION
-def tablename(name):
+def tablename(name, infile=None, outfile=None):
     """
     Currently not implemented 
     :param name:
     :return: 
     """
-    raise NotImplementedError("tablename function is not currently implemented")
+    if name is None or str(name).strip() == '':
+        raise ValueError('Error: name must be set')
+    ustr = 'tablename {0}'.format(__checkq__(str(name)))
+    if infile is None:
+        return ustr
+    if outfile is not None:
+        tpipe(cmds=ustr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
 # TODO: tail FUNCTION
-def tail(nrows):
+def tail(nrows, infile=None, outfile=None):
     """
     Currently not implemented 
     :param nrows:
     :return: 
     """
-    raise NotImplementedError("tail function is not currently implemented")
+    try:
+        nrows = int(nrows)
+    except ValueError:
+        raise ValueError('Error: nrows must be an integer')
+    if nrows < 0:
+        raise ValueError('Error: nrows must be >= 0')
+    ustr = 'tail {0}'.format(nrows)
+    if infile is None:
+        return ustr
+    if outfile is not None:
+        tpipe(cmds=ustr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=ustr, infile=infile, outfile=infile)
 
 
 # TODO: transpose FUNCTION
@@ -1021,14 +1085,35 @@ def transpose(colname, columnnames=None):
 
 
 # TODO: uniq FUNCTION
-def uniq(colname, count=None):
+def uniq(keys, count=False, infile=None, outfile=None):
     """
     Currently not implemented 
     :param colname:
     :param count:
     :return: 
     """
-    raise NotImplementedError("uniq function is not currently implemented")
+    if keys is None:
+        raise ValueError('Error: keys must be set')
+    if isinstance(keys, str):
+        skeys = keys.strip()
+    else:
+        skeys = ' '.join([str(key) for key in keys]).strip()
+    if skeys == '':
+        raise ValueError('Error: keys must be set')
+    if type(count) is not bool:
+        raise ValueError('Error: count must be boolean')
+
+    cmdstr = 'uniq '
+    if count:
+        cmdstr += '-count '
+    cmdstr += '{0}'.format(__checkq__(skeys))
+
+    if infile is None:
+        return cmdstr
+    if outfile is not None:
+        tpipe(cmds=cmdstr, infile=infile, outfile=outfile)
+    else:
+        tpipe(cmds=cmdstr, infile=infile, outfile=infile)
 
 
 def __checkq__(expression):
